@@ -1,9 +1,9 @@
 const router = require('express').Router();
-const cardsController = require('../controllers/cards');
+const moviesController = require('../controllers/movies');
 const usersValidate = require('../middlewares/validate');
 
-router.get('/', cardsController.getCards);
-router.post('/', usersValidate.validateCardCreate, cardsController.createCard);
-router.delete('/:movieId', usersValidate.validateCardId, cardsController.deleteCard);
+router.get('/', moviesController.getMovies);
+router.post('/', usersValidate.validateCardCreate, moviesController.addMovie);
+router.delete('/:movieId', usersValidate.validateCardId, moviesController.deleteMovie);
 
 module.exports = router;
