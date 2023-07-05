@@ -1,5 +1,13 @@
 const { celebrate, Joi } = require('celebrate');
 const isURL = require('validator/lib/isURL');
+const ValidationError = require('../errors/ValidationError');
+
+const checkURL = (value) => {
+  if (!isURL(value)) {
+    throw new ValidationError('Некорректный URL');
+  }
+  return value;
+};
 
 const validateUserCreate = celebrate({
   body: Joi.object().keys({
@@ -30,9 +38,9 @@ const validateAddMovie = celebrate({
     duration: Joi.number().required(),
     year: Joi.string().required(),
     description: Joi.string().required(),
-    image: Joi.string().required().custom(isURL()),
-    trailerLink: Joi.string().required().custom(isURL()),
-    thumbnail: Joi.string().required().custom(isURL()),
+    image: Joi.string().required().custom(checkURL),
+    trailerLink: Joi.string().required().custom(checkURL),
+    thumbnail: Joi.string().required().custom(checkURL),
     movieId: Joi.number().required(),
     nameRU: Joi.string().required(),
     nameEN: Joi.string().required(),
