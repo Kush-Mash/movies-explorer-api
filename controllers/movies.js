@@ -10,10 +10,35 @@ const getMovies = (req, res, next) => {
     .catch(next);
 };
 
-const addMovie = (req, res, next) => {
-  const { name, link } = req.body;
+const createMovie = (req, res, next) => {
+  const {
+    country,
+    director,
+    duration,
+    year,
+    description,
+    image,
+    trailerLink,
+    thumbnail,
+    movieId,
+    nameRU,
+    nameEN,
+  } = req.body;
   const owner = req.user._id;
-  Movie.create({ name, link, owner })
+  Movie.create({
+    country,
+    director,
+    duration,
+    year,
+    description,
+    image,
+    trailerLink,
+    thumbnail,
+    movieId,
+    nameRU,
+    nameEN,
+    owner,
+  })
     .then((movie) => res.status(201).send(movie))
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
@@ -27,10 +52,10 @@ const addMovie = (req, res, next) => {
 const deleteMovie = (req, res, next) => {
   const { movieId } = req.params;
   Movie.findById(movieId)
-    .then((card) => {
-      if (!card) {
+    .then((movie) => {
+      if (!movie) {
         throw new NotFoundError('Передан несуществующий id фильма');
-      } else if (card.owner.toString() !== req.user._id.valueOf()) {
+      } else if (movie.owner.toString() !== req.user._id.valueOf()) {
         throw new ForbiddenError('Отсутствуют права доступа для удаления данного фильма');
       }
       Movie.findByIdAndRemove(movieId)
@@ -42,6 +67,6 @@ const deleteMovie = (req, res, next) => {
 
 module.exports = {
   getMovies,
-  addMovie,
+  createMovie,
   deleteMovie,
 };

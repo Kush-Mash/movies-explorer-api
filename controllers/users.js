@@ -1,6 +1,15 @@
 const { default: mongoose } = require('mongoose');
 const bcrypt = require('bcryptjs');
 const User = require('../models/user');
+const { signToken } = require('../utils/jwtAuth');
+
+const MONGO_DUPLICATE_KEY_ERROR = 11000;
+const SALT_ROUNDS = 10;
+
+const ConflictError = require('../errors/ConflictError');
+const ValidationError = require('../errors/ValidationError');
+const NotFoundError = require('../errors/NotFoundError');
+const UnauthorizedError = require('../errors/UnauthorizedError');
 
 const login = (req, res, next) => {
   const { email, password } = req.body;
@@ -28,18 +37,14 @@ const login = (req, res, next) => {
 };
 
 const createUser = (req, res, next) => {
-  const {
-    email, password, name, about, avatar,
-  } = req.body;
+  const { email, password, name } = req.body;
 
   bcrypt.hash(password, SALT_ROUNDS).then((hash) => {
     User.create({
-      email, password: hash, name, about, avatar,
+      email, password: hash, name,
     })
       .then(() => {
-        res.status(201).send({
-          email, name, about, avatar,
-        });
+        res.status(201).send({ email, name });
       })
       .catch((err) => {
         if (err instanceof mongoose.Error.ValidationError) {
@@ -66,10 +71,10 @@ const getCurrentUser = (req, res, next) => {
 };
 
 const updateUser = (req, res, next) => {
-  const { name, about } = req.body;
+  const { name, email } = req.body;
   User.findByIdAndUpdate(
     req.user._id,
-    { name, about },
+    { name, email },
     { new: true, runValidators: true },
   )
     .then((user) => {
