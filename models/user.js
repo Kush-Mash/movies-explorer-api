@@ -1,12 +1,17 @@
 const mongoose = require('mongoose');
-const isEmail = require('validator/lib/isEmail');
+const validator = require('validator');
+const ValidationError = require('../errors/ValidationError');
 
 const userSchema = new mongoose.Schema({
   email: {
     type: String,
     required: true,
     unique: true,
-    validate: isEmail,
+    validate(value) {
+      if (!validator.isEmail(value)) {
+        throw new ValidationError('Некорректный формат почты');
+      }
+    },
   },
   password: {
     type: String,

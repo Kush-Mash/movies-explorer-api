@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
-const isURL = require('validator/lib/isURL');
+const validator = require('validator');
 
 const { ObjectId } = mongoose.Schema.Types;
+const ValidationError = require('../errors/ValidationError');
 
 const userSchema = new mongoose.Schema({
   country: {
@@ -27,17 +28,29 @@ const userSchema = new mongoose.Schema({
   image: {
     type: String,
     required: true,
-    validate: isURL,
+    validate(value) {
+      if (!validator.isURL(value)) {
+        throw new ValidationError('Некорректный адрес ссылки на постер к фильму');
+      }
+    },
   },
   trailerLink: { // Ссылка на трейлер
     type: String,
     required: true,
-    validate: isURL,
+    validate(value) {
+      if (!validator.isURL(value)) {
+        throw new ValidationError('Некорректный адрес ссылки на трейлер фильма');
+      }
+    },
   },
   thumbnail: { // Постер-миниатюра
     type: String,
     required: true,
-    validate: isURL,
+    validate(value) {
+      if (!validator.isURL(value)) {
+        throw new ValidationError('Некорректный адрес ссылки на миниатюру');
+      }
+    },
   },
   owner: {
     type: ObjectId,
