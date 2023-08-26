@@ -87,6 +87,8 @@ const updateUser = (req, res, next) => {
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
         next(new ValidationError('Переданы некорректные данные при обновлении профиля'));
+      } else if (err.code === MONGO_DUPLICATE_KEY_ERROR) {
+        next(new ConflictError('Пользователь с указанной почтой уже существует'));
       } else {
         next(err);
       }
